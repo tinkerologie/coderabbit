@@ -1,0 +1,16 @@
+name: Issue Type Labeler
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  label:
+    permissions:
+      issues: write
+    uses: tinkerologie/.github/.github/workflows/issue-labeler.yml@v1

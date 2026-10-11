@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# Central CodeRabbit configuration for every tinkerologie repository that has
+# no .coderabbit.yaml of its own. `inheritance: true` keeps the Organization UI
+# settings (review profile, tools, etc.) for anything not set here. A repo that
+# adds its own .coderabbit.yaml should also set `inheritance: true` to build on
+# this file instead of replacing it.
+inheritance: true
+
+issue_enrichment:
+  auto_enrich:
+    enabled: true
+  labeling:
+    # The org "Issue Type Labeler" workflow labels most issues instantly from
+    # the template title prefix. CodeRabbit covers the ambiguous rest.
+    auto_apply_labels: true
+    labeling_instructions:
+      - label: bug
+        instructions: >-
+          Apply only when the issue has neither the `bug` nor the `enhancement` label.
+          The issue reports a defect: something that worked or should work is broken,
+          returns wrong or missing data, crashes, errors, hangs, or regressed.
+      - label: enhancement
+        instructions: >-
+          Apply only when the issue has neither the `bug` nor the `enhancement` label.
+          The issue asks for new functionality, new device or platform support, an
+          option, a performance or test-coverage improvement, a refactor, or documentation.
+  planning:
+    enabled: true
+    auto_planning:
+      enabled: true
+      labels:
+        - bug
+        - enhancement
+        - "!no-plan"
+
+reviews:
+  pre_merge_checks:
+    issue_assessment:
+      mode: warning
+    custom_checks:
+      - name: Tests cover changed code
+        mode: error
+        instructions: >-
+          Pass if every new or changed function, method, branch, or error path in
+          non-test source files is exercised by tests added or updated in this PR,
+          or if the PR only changes documentation, CI configuration, metadata, or
+          generated files. Fail otherwise, and list each untested function or branch
+          with its file path. Codecov's codecov/patch check requires at least 90% of
+          changed lines to be covered; do not suggest lowering coverage targets or
+          adding coverage ignore rules.
