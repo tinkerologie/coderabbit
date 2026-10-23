@@ -7,28 +7,31 @@
 # this file instead of replacing it.
 inheritance: true
 
-# Global persona & priority filter (Schema limit: max 250 characters)
+# Applies to reviews and chat, so it sets style only. Severity filtering for
+# reviews lives in reviews.path_instructions. (Schema limit: 250 characters)
 tone_instructions: >-
-  Report ONLY critical and major issues (bugs, security flaws, data loss, race
-  conditions, breaking changes). Never comment on style, naming, formatting, or
-  minor nitpicks. Be concise and direct.
+  Be concise and direct. Skip praise, filler, and restating what the diff
+  already shows.
 
 issue_enrichment:
   auto_enrich:
     enabled: true
   labeling:
     # The org "Issue Type Labeler" workflow labels most issues instantly from
-    # the template title prefix. CodeRabbit covers the ambiguous rest.
+    # the template title prefix. CodeRabbit covers the ambiguous rest, and
+    # honours the same opt-out labels (see GOVERNANCE.md).
     auto_apply_labels: true
     labeling_instructions:
       - label: bug
         instructions: >-
-          Apply only when the issue has neither the `bug` nor the `enhancement` label.
+          Apply only when the issue has none of these labels: `bug`, `enhancement`,
+          `question`, `duplicate`, `invalid`, `wontfix`, `no-type`.
           The issue reports a defect: something that worked or should work is broken,
           returns wrong or missing data, crashes, errors, hangs, or regressed.
       - label: enhancement
         instructions: >-
-          Apply only when the issue has neither the `bug` nor the `enhancement` label.
+          Apply only when the issue has none of these labels: `bug`, `enhancement`,
+          `question`, `duplicate`, `invalid`, `wontfix`, `no-type`.
           The issue asks for new functionality, new device or platform support, an
           option, a performance or test-coverage improvement, a refactor, or documentation.
   planning:
@@ -39,10 +42,18 @@ issue_enrichment:
         - bug
         - enhancement
         - "!no-plan"
+        - "!duplicate"
+        - "!invalid"
+        - "!wontfix"
 
 reviews:
-  # Explicitly lock the profile in config ("chill" or "quiet")
-  profile: chill
+  # The review profile is set in the Organization UI (quiet); do not set
+  # `profile` here, or it overrides the UI.
+
+  # CodeRabbit requests changes until its comments are resolved and no
+  # error-mode pre-merge check fails, then approves. Without this, `mode: error`
+  # checks do not block merging.
+  request_changes_workflow: true
 
   # Apply strict severity filtering across all files
   path_instructions:
@@ -50,20 +61,31 @@ reviews:
       instructions: >-
         Focus exclusively on major and critical defects: logic bugs, unhandled
         exceptions, security vulnerabilities, memory/resource leaks, concurrency
-        hazards, and regressions. Do not leave inline comments for minor code
-        smells, stylistic preferences, variable naming, or micro-optimizations.
+        hazards, data loss, breaking changes, and regressions. Do not leave inline
+        comments for minor code smells, stylistic preferences, variable naming,
+        formatting, or micro-optimizations.
 
   pre_merge_checks:
+    docstrings:
+      mode: "off"
+    title:
+      mode: "off"
+    description:
+      mode: "off"
     issue_assessment:
       mode: warning
     custom_checks:
       - name: Tests cover changed code
         mode: error
         instructions: >-
-          Pass if every new or changed function, method, branch, or error path in
-          non-test source files is exercised by tests added or updated in this PR,
-          or if the PR only changes documentation, CI configuration, metadata, or
-          generated files. Fail otherwise, and list each untested function or branch
-          with its file path. Codecov's codecov/patch check requires at least 90% of
-          changed lines to be covered; do not suggest lowering coverage targets or
-          adding coverage ignore rules.
+          Pass if the new or changed behaviour in non-test source files (new or
+          changed functions and methods, new branches, and new error handling) is
+          exercised by tests added or updated in this PR, or if the PR only changes
+          documentation, CI configuration, metadata, dependency lock files, or
+          generated files. Lines with no behaviour of their own (logging, imports,
+          re-exports, type-only declarations, constants) do not need dedicated tests.
+          Fail otherwise, and list each untested function or branch with its file
+          path. This check complements Codecov's codecov/patch gate, which requires
+          at least 90% of changed lines to be covered (some repositories set a
+          higher target); never suggest lowering coverage targets or adding coverage
+          ignore rules.

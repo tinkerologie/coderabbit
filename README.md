@@ -11,7 +11,14 @@ anything not defined here. It adds:
   org's Issue Type Labeler workflow could not classify.
 - Automatic coding plans for issues labeled `bug` or `enhancement`
   (opt out with `no-plan`).
-- A pre-merge check that fails when changed code has no tests.
+- Issue labeling and planning skip issues labeled `question`, `duplicate`,
+  `invalid`, `wontfix`, or `no-type`, matching the Issue Type Labeler.
+- A pre-merge check that fails when changed code has no tests. It complements
+  Codecov's `codecov/patch` gate. The request changes workflow is on, so a
+  failing check blocks the merge until it passes.
+- The docstring, title, and description pre-merge checks are off.
+
+The review profile is not set here; it comes from the Organization UI.
 
 Validate changes with:
 
