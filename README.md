@@ -13,12 +13,13 @@ anything not defined here. It adds:
   (opt out with `no-plan`).
 - Issue labeling and planning skip issues labeled `question`, `duplicate`,
   `invalid`, `wontfix`, or `no-type`, matching the Issue Type Labeler.
-- A pre-merge check that fails when changed code has no tests. It complements
-  Codecov's `codecov/patch` gate. The request changes workflow is on, so a
-  failing check blocks the merge until it passes.
+- A pre-merge check that warns when changed code has no tests. It complements
+  Codecov's `codecov/patch` gate, which enforces coverage. It is a warning, not
+  an error, because the rulesets require no approving reviews, so a CodeRabbit
+  change request would not block the merge anyway.
 - The docstring, title, and description pre-merge checks are off.
 
-The review profile is not set here; it comes from the Organization UI.
+The review profile is `quiet`, the same as the Organization UI.
 
 Validate changes with:
 

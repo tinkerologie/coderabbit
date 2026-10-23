@@ -47,12 +47,12 @@ issue_enrichment:
         - "!wontfix"
 
 reviews:
-  # The review profile is set in the Organization UI (quiet); do not set
-  # `profile` here, or it overrides the UI.
+  # Pinned here so the profile is versioned; it matches the Organization UI.
+  profile: quiet
 
   # CodeRabbit requests changes until its comments are resolved and no
-  # error-mode pre-merge check fails, then approves. Without this, `mode: error`
-  # checks do not block merging.
+  # error-mode pre-merge check fails, then approves. The rulesets require no
+  # approving reviews, so a change request does not block merging on its own.
   request_changes_workflow: true
 
   # Apply strict severity filtering across all files
@@ -75,8 +75,10 @@ reviews:
     issue_assessment:
       mode: warning
     custom_checks:
+      # Warning, not error: an AI judgement should not block a merge. Codecov's
+      # codecov/patch gate enforces coverage.
       - name: Tests cover changed code
-        mode: error
+        mode: warning
         instructions: >-
           Pass if the new or changed behaviour in non-test source files (new or
           changed functions and methods, new branches, and new error handling) is
