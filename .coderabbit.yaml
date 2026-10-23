@@ -7,6 +7,12 @@
 # this file instead of replacing it.
 inheritance: true
 
+# Global persona & priority filter (Schema limit: max 250 characters)
+tone_instructions: >-
+  Report ONLY critical and major issues (bugs, security flaws, data loss, race
+  conditions, breaking changes). Never comment on style, naming, formatting, or
+  minor nitpicks. Be concise and direct.
+
 issue_enrichment:
   auto_enrich:
     enabled: true
@@ -35,6 +41,18 @@ issue_enrichment:
         - "!no-plan"
 
 reviews:
+  # Explicitly lock the profile in config ("chill" or "quiet")
+  profile: chill
+
+  # Apply strict severity filtering across all files
+  path_instructions:
+    - path: "**/*"
+      instructions: >-
+        Focus exclusively on major and critical defects: logic bugs, unhandled
+        exceptions, security vulnerabilities, memory/resource leaks, concurrency
+        hazards, and regressions. Do not leave inline comments for minor code
+        smells, stylistic preferences, variable naming, or micro-optimizations.
+
   pre_merge_checks:
     issue_assessment:
       mode: warning
